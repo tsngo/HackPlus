@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Default" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Guid>2963d47b-0dbd-407c-93a9-a123099d0e5f</Guid>
+    <Name>Hack Plus</Name>
+    <Description>Gain 5 hacking skill points after each successful hack. Inspiration came from watching ChristopherOdd's Lengendary Ironman playthrough on YouTube. +5 is configable using ini. I also left debug settings in the ini which makes hacks always succeed and makes them not cost an action (similar to lightning hands). These are off by default. Techno-bable follows: This mod uses UIScreenListener to modify FinalizeHack and FinalizeIntrusion templates from X2Ability_DefaultAbilitySet and X2Ability_SpecialistAbilitySet classes.Anything that modifies hacking in these two templates will likely conflict.</Description>
+    <SteamPublishID>0</SteamPublishID>
+    <AssemblyName>HackPlus</AssemblyName>
+    <RootNamespace>HackPlus</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Config\" />
+    <Folder Include="Content\" />
+    <Folder Include="Localization\" />
+    <Folder Include="Src\" />
+    <Folder Include="Src\HackPlus\" />
+    <Folder Include="Src\HackPlus\Classes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Config\XComHackPlus.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ReadMe.txt" />
+    <Content Include="ModPreview.jpg" />
+    <Content Include="Config\XComEditor.ini" />
+    <Content Include="Config\XComEngine.ini" />
+    <Content Include="Config\XComGame.ini" />
+    <Content Include="Localization\XComGame.int" />
+    <Content Include="Src\HackPlus\Classes\HackPlusConfig.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\HackPlus\Classes\HackPlusUIScreenListener.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\HackPlus\Classes\HackPlus_X2AbilityToHitCalc_Hacking.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\HackPlus\Classes\HackPlus_X2Ability_DefaultAbilitySet.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\HackPlus\Classes\HackPlus_X2Ability_SpecialistAbilitySet.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\HackPlus\Classes\X2DownloadableContentInfo_HackPlus.uc" />
+  </ItemGroup>
+  <Import Project="$(MSBuildLocalExtensionPath)\XCOM2.targets" />
+</Project>
