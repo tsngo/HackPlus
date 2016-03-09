@@ -65,7 +65,7 @@ simulated function XComGameState FinalizeHackAbility_BuildGameState(XComGameStat
 		`Redscreen("Success " $ rewardValue);
 	}
 	else {
-		rewardValue = userRewardChoice >= 2 ? hackConfig.getHackPointRewardOnFail() : hackConfig.getHackPointRewardEasyOnFail();
+		rewardValue = hackConfig.getHackPointRewardOnFail();
 		`Redscreen("Fail " $ rewardValue);
 	}
 
