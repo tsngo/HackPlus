@@ -1,5 +1,8 @@
 class HackPlus_X2Ability_DefaultAbilitySet extends X2Ability_DefaultAbilitySet;
 
+var int finalReward;
+var bool hackSuccess;
+
 static function array<X2DataTemplate> CreateTemplates()
 {
 	local array<X2DataTemplate> Templates;
@@ -59,21 +62,22 @@ simulated function XComGameState FinalizeHackAbility_BuildGameState(XComGameStat
 		TargetUnit = XComGameState_Unit(TargetState);	
 	userRewardChoice = ObjectState == none ? TargetUnit.UserSelectedHackReward : ObjectState.UserSelectedHackReward;
 
-	`RedScreen("Choice " $ userRewardChoice);
 	if ((ObjectState != none && ObjectState.bHasBeenHacked) || TargetUnit.bHasBeenHacked) {
 		rewardValue = userRewardChoice >= 2 ? hackConfig.getHackPointRewardOnSuccess() : hackConfig.getHackPointRewardEasyOnSuccess();
-		`Redscreen("Success " $ rewardValue);
+		hackSuccess = true;
 	}
 	else {
 		rewardValue = hackConfig.getHackPointRewardOnFail();
-		`Redscreen("Fail " $ rewardValue);
+		hackSuccess = false;
 	}
 
-	if (hackConfig.getRandomizeReward()) {
+	if (hackConfig.getRandomizeReward() && rewardValue > 0) {
 		rewardValue = `SYNC_RAND(rewardValue);
-		`Redscreen("Random " $ rewardValue);
+		if (rewardValue == 0)
+			rewardValue = 1;
 	}
-
+	
+	finalReward = rewardValue;
 	if (rewardvalue <= 0)
 		return NewGameState;
 
@@ -82,4 +86,45 @@ simulated function XComGameState FinalizeHackAbility_BuildGameState(XComGameStat
 	UnitState.SetBaseMaxStat(eStat_Hacking, UnitState.GetMaxStat(eStat_Hacking) + rewardValue);	
 
 	return NewGameState;
+}
+
+simulated function FinalizeHackAbility_BuildVisualization(XComGameState VisualizeGameState, out array<VisualizationTrack> OutVisualizationTracks)
+{
+	local XComGameStateHistory History;
+	local XComGameStateContext_Ability  AbilityContext;
+	local StateObjectReference          InteractingUnitRef;
+
+	local VisualizationTrack        EmptyTrack;
+	local VisualizationTrack        BuildTrack;
+
+	local X2Action_PlaySoundAndFlyOver SoundAndFlyOver;
+
+	super.FinalizeHackAbility_BuildVisualization(VisualizeGameState, OutVisualizationTracks);
+
+	History = `XCOMHISTORY;
+
+	//Configure the visualization track for the shooter
+	//****************************************************************************************
+	AbilityContext = XComGameStateContext_Ability(VisualizeGameState.GetContext());
+	InteractingUnitRef = AbilityContext.InputContext.SourceObject;
+
+	BuildTrack = EmptyTrack;
+	BuildTrack.StateObject_OldState = History.GetGameStateForObjectID(InteractingUnitRef.ObjectID, eReturnType_Reference, VisualizeGameState.HistoryIndex - 1);
+	BuildTrack.StateObject_NewState = VisualizeGameState.GetGameStateForObjectID(InteractingUnitRef.ObjectID);
+	BuildTrack.TrackActor = History.GetVisualizer(InteractingUnitRef.ObjectID);
+
+	if (finalReward > 0) {
+		SoundAndFlyOver = X2Action_PlaySoundAndFlyOver(class'X2Action_PlaySoundAndFlyOver'.static.AddToVisualizationTrack(BuildTrack, AbilityContext));
+		SoundAndFlyOver.SetSoundAndFlyOverParameters(None, "+" $ finalReward $ " Hack", 'None', hackSuccess ? eColor_Good : eColor_xcom);
+		SoundAndFlyOver.LookAtDuration = `DEFAULTFLYOVERLOOKATTIME;
+		//SoundAndFlyOver.BlockUntilFinished = true;
+		SoundAndFlyOver.DelayDuration = 1.5f;
+	}
+
+	OutVisualizationTracks.AddItem(BuildTrack);
+}
+
+defaultproperties {
+	finalReward = 0;
+	hackSuccess = false;
 }
