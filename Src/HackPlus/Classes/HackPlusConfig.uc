@@ -7,6 +7,18 @@ var config int HackPointRewardEasyOnFail;
 var config int HackPointRewardOnFail;
 var config bool AlwaysSucceed;
 var config bool FreeAction;
+var config bool DiminishingReturns;
+var config int DiminishingReturnsStartsAbove;
+
+simulated function bool getDiminishingReturns()
+{
+	return DiminishingReturns;
+}
+
+simulated function int getDiminishingReturnsStartsAbove()
+{
+	return DiminishingReturnsStartsAbove;
+}
 
 simulated function bool getRandomizeReward()
 {

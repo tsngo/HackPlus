@@ -47,6 +47,8 @@ simulated function XComGameState FinalizeHackAbility_BuildGameState(XComGameStat
 	local HackPlusConfig hackConfig;
 	local int rewardValue;
 	local int userRewardChoice;
+	local int levelsAbove;
+	local int timesAbove;
 
 	History = `XCOMHISTORY;
 
@@ -71,6 +73,16 @@ simulated function XComGameState FinalizeHackAbility_BuildGameState(XComGameStat
 		hackSuccess = false;
 	}
 
+	if (hackConfig.getDiminishingReturns()) {
+		levelsAbove = UnitState.GetMaxStat(eStat_Hacking) - hackConfig.getDiminishingReturnsStartsAbove();
+		if (levelsAbove > 0) {
+			timesAbove = 1 + ffloor(levelsAbove / 20) - (levelsAbove % 20 == 0 ? 1 : 0);
+			rewardValue -= timesAbove;
+			if (rewardValue < 0)
+				rewardValue = 0;
+		}
+	}
+
 	if (hackConfig.getRandomizeReward() && rewardValue > 0) {
 		rewardValue = `SYNC_RAND(rewardValue);
 		if (rewardValue == 0)
@@ -78,7 +90,7 @@ simulated function XComGameState FinalizeHackAbility_BuildGameState(XComGameStat
 	}
 	
 	finalReward = rewardValue;
-	if (rewardvalue <= 0)
+	if (rewardValue <= 0)
 		return NewGameState;
 
 	// Apply award
