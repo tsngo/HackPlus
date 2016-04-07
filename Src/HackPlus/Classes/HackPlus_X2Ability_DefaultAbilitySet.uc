@@ -10,13 +10,9 @@ static function array<X2DataTemplate> CreateTemplates()
 	return Templates;
 }
 
-static function X2AbilityTemplate FinalizeHack()
-{
-	local X2AbilityTemplate                 Template;		
+static function X2AbilityTemplate InjectHackPlus(X2AbilityTemplate Template) {
 	local X2AbilityCost_ActionPoints        ActionPointCost;
 	local HackPlusConfig hackConfig;
-
-	Template = super.FinalizeHack();
 
 	hackConfig = new class'HackPlusConfig';
 	if (hackConfig.getFreeAction()) {
@@ -32,6 +28,17 @@ static function X2AbilityTemplate FinalizeHack()
 	}
 
 	Template.BuildNewGameStateFn = class'HackPlus_X2Ability_DefaultAbilitySet'.static.FinalizeHackAbility_BuildGameState;
+	Template.BuildVisualizationFn = class'HackPlus_X2Ability_DefaultAbilitySet'.static.FinalizeHackAbility_BuildVisualization;
+
+	return Template;
+}
+
+static function X2AbilityTemplate FinalizeHack()
+{
+	local X2AbilityTemplate                 Template;		
+
+	Template = super.FinalizeHack();
+	InjectHackPlus(Template);
 
 	return Template;
 }
